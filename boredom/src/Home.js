@@ -13,7 +13,7 @@ const theme = createTheme({
     },
 });
 
-const messages = [
+const preMessages = [
     {
         text: "Hello!",
         author: "User 1",
@@ -34,8 +34,29 @@ const messages = [
 
 function Home() {
     const [videoSrc, setVideoSrc] = useState(null);
+    const [message, setMessage] = useState("");
+    const [messages, setMessages] = useState([]);
+    const postMessage = () => {
+        if (message === "") return;
+        const newMessage = {
+            text: message,
+            author: "User 1",
+        };
+        setMessages((prevMessages) => [...prevMessages, newMessage]);
+        document.getElementById("message").value = "";
+        // send message to server
+
+        // receive message from server
+        setTimeout((prevMessages) => {
+            setMessages([
+                ...prevMessages,
+                { text: "I'm bored too!", author: "User 2" },
+            ]);
+        }, 1000);
+    };
 
     useEffect(() => {
+        setMessages([...preMessages]);
         const video = document.querySelector("video");
         navigator.mediaDevices
             .getUserMedia({ video: true })
@@ -58,12 +79,27 @@ function Home() {
                     width: "100vw",
                 }}
             >
-                <Grid item xs={12} sm={6}>
+                <Box
+                    sx={{
+                        width: "100%",
+                        textAlign: "center",
+                        marginTop: "2vh",
+                    }}
+                >
+                    <Typography variant="h3">Boredom</Typography>
+                </Box>
+                <Grid
+                    item
+                    xs={12}
+                    sm={6}
+                    sx={{
+                        margin: "auto",
+                    }}
+                >
                     <Box
                         sx={{
                             width: "100%",
                             // height: "40vh",
-                            marginTop: "7vh",
                             marginLeft: "1vw",
                         }}
                     >
@@ -85,23 +121,25 @@ function Home() {
                     </Box>
                     <Box
                         sx={{
-                            border: "1px solid black",
-                            borderRadius: "10px",
                             width: "100%",
-                            height: "40vh",
-                            marginTop: "7vh",
                             marginLeft: "1vw",
                         }}
                     >
-                        <Typography
-                            sx={{
-                                textAlign: "center",
-                                margin: "auto",
-                                marginTop: "35%",
-                            }}
-                        >
-                            Video 2
-                        </Typography>
+                        {videoSrc ? (
+                            <video
+                                style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    borderRadius: "10px",
+                                    boxShadow:
+                                        "0 19px 51px 0 rgba(0,0,0,0.16), 0 14px 19px 0 rgba(0,0,0,0.07)",
+                                }}
+                                autoPlay
+                                playsInline
+                            />
+                        ) : (
+                            <p>Loading video...</p>
+                        )}
                     </Box>
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -111,7 +149,6 @@ function Home() {
                             borderRadius: "10px",
                             width: "100%",
                             height: "87vh",
-                            marginTop: "7vh",
                             marginRight: "2vw",
                             marginLeft: "1vw",
                             position: "relative",
@@ -152,9 +189,10 @@ function Home() {
                                 Next
                             </Button>
                             <TextField
-                                id="outlined-basic"
+                                id="message"
                                 label="Message"
                                 variant="outlined"
+                                onChange={(e) => setMessage(e.target.value)}
                                 fullWidth
                             />
                             <Button
@@ -163,6 +201,7 @@ function Home() {
                                 sx={{
                                     height: "4em",
                                 }}
+                                onClick={postMessage}
                             >
                                 Send
                             </Button>
