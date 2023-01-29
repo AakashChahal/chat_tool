@@ -47,8 +47,8 @@ function Home() {
         // send message to server
 
         // receive message from server
-        setTimeout((prevMessages) => {
-            setMessages([
+        setTimeout(() => {
+            setMessages((prevMessages) => [
                 ...prevMessages,
                 { text: "I'm bored too!", author: "User 2" },
             ]);
