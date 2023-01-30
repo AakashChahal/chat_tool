@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import {
     Box,
     Button,
-    FormControl,
+    Link,
     FormHelperText,
     Grid,
     TextField,
@@ -93,6 +93,7 @@ function SignUp() {
         if (email === "") {
             setEmailError(true);
             setEmailHelperText("Email cannot be empty");
+            return;
         } else {
             setEmailError(false);
             setEmailHelperText("");
@@ -101,6 +102,7 @@ function SignUp() {
         if (password === "") {
             setPasswordError(true);
             setPasswordHelperText("Password cannot be empty");
+            return;
         } else {
             setPasswordError(false);
             setPasswordHelperText("");
@@ -109,10 +111,33 @@ function SignUp() {
         if (passwordConfirm === "") {
             setPasswordError(true);
             setPasswordConfirmHelperText("Password cannot be empty");
+            return;
         } else {
             setPasswordError(false);
             setPasswordConfirmHelperText("");
         }
+
+        if (password !== passwordConfirm) {
+            setPasswordError(true);
+            setPasswordConfirmHelperText("Passwords do not match");
+            return;
+        } else {
+            setPasswordError(false);
+            setPasswordConfirmHelperText("");
+        }
+
+        createUserWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                // Signed in
+                const user = userCredential.user;
+                // ...
+                window.location.href = "/home";
+            })
+            .catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                // ..
+            });
     };
 
     const handleGoogleSignUp = () => {
@@ -139,6 +164,10 @@ function SignUp() {
                 // ...
             });
     };
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
 
     return (
         <ThemeProvider theme={theme}>
@@ -183,26 +212,78 @@ function SignUp() {
                         >
                             Sign Up
                         </Typography>
-                        <Box sx={{ width: "100%", textAlign: "center" }}>
-                            <FormControl
+                        <Box
+                            sx={{
+                                width: "50%",
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                                gap: "0.2rem",
+                            }}
+                        >
+                            <TextField
+                                fullWidth
+                                id="email"
+                                label="Email Address"
+                                aria-describedby="email-helper-text"
+                                onChange={handleEmailChange}
+                            />
+                            <FormHelperText id="email-helper-text">
+                                {emailError && emailHelperText}
+                            </FormHelperText>
+                            <TextField
+                                fullWidth
+                                id="password"
+                                type={"password"}
+                                label="Password"
+                                aria-describedby="password-helper-text"
+                                onChange={handlePasswordChange}
+                            />
+                            <FormHelperText id="password-helper-text">
+                                {passwordError && passwordHelperText}
+                            </FormHelperText>
+                            <TextField
+                                fullWidth
+                                id="password-confirm"
+                                type={"password"}
+                                label="Confirm Password"
+                                onChange={handlePasswordConfirmChange}
+                                aria-describedby="password-confirm-helper-text"
+                            />
+                            <FormHelperText id="password-confirm-helper-text">
+                                {passwordError && passwordConfirmHelperText}
+                            </FormHelperText>
+                            <Button
+                                fullWidth
                                 sx={{
-                                    width: "50%",
+                                    color: "blue.secondary",
+                                    border: "1px solid blue",
+                                    "&:hover": {
+                                        backgroundColor: "blue.main",
+                                        color: "white",
+                                        boxShadow:
+                                            "0.2rem 0.2rem 1rem 0 rgba(0,0,0,0.25)",
+                                    },
+                                    borderRadius: "0.5rem",
                                 }}
+                                onClick={handleSignUp}
                             >
-                                <TextField
-                                    id="email"
-                                    label="Email Address"
-                                    aria-describedby="email-helper-text"
-                                />
-                                <FormHelperText id="email-helper-text">
-                                    We'll never share your email.
-                                </FormHelperText>
-                                <TextField
-                                    id="password"
-                                    type={"password"}
-                                    label="Password"
-                                />
-                            </FormControl>
+                                Sign Up
+                            </Button>
+                            <Typography variant="p">
+                                Already have an account?{" "}
+                                <Link
+                                    href="/signin"
+                                    sx={{
+                                        color: "blue.main",
+                                        "&:hover": {
+                                            color: "blue.secondary",
+                                        },
+                                    }}
+                                >
+                                    Login
+                                </Link>
+                            </Typography>
                         </Box>
                         <Typography component={"h1"} variant={"h5"}>
                             OR
@@ -215,6 +296,8 @@ function SignUp() {
                                 "&:hover": {
                                     backgroundColor: "blue.main",
                                     color: "white",
+                                    boxShadow:
+                                        "0.2rem 0.2rem 1rem 0 rgba(0,0,0,0.25)",
                                 },
                                 borderRadius: "0.5rem",
                             }}
