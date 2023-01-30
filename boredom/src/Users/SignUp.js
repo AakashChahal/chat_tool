@@ -18,7 +18,6 @@ import {
     signInWithPopup,
     GoogleAuthProvider,
 } from "firebase/auth";
-import { redirect } from "react-router-dom";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -130,12 +129,15 @@ function SignUp() {
             .then((userCredential) => {
                 // Signed in
                 const user = userCredential.user;
+                console.log(user);
                 // ...
                 window.location.href = "/home";
             })
             .catch((error) => {
                 const errorCode = error.code;
+                console.log(errorCode);
                 const errorMessage = error.message;
+                console.log(errorMessage);
                 // ..
             });
     };
@@ -147,20 +149,26 @@ function SignUp() {
                 const credential =
                     GoogleAuthProvider.credentialFromResult(result);
                 const token = credential.accessToken;
+                console.log(token);
                 // The signed-in user info.
                 const user = result.user;
+                console.log(user);
                 // ...
                 window.location.href = "/home";
             })
             .catch((error) => {
                 // Handle Errors here.
                 const errorCode = error.code;
+                console.log(errorCode);
                 const errorMessage = error.message;
+                console.log(errorMessage);
                 // The email of the user's account used.
                 const email = error.customData.email;
+                console.log(email);
                 // The AuthCredential type that was used.
                 const credential =
                     GoogleAuthProvider.credentialFromError(error);
+                console.log(credential);
                 // ...
             });
     };
