@@ -60,6 +60,7 @@ const theme = createTheme({
 function SignIn() {
     const [email, setEmail] = React.useState("");
     const [password, setPassword] = React.useState("");
+    const [errorMessage, setErrorMessage] = React.useState("");
     const [passwordError, setPasswordError] = React.useState(false);
     const [emailError, setEmailError] = React.useState(false);
     const [emailHelperText, setEmailHelperText] = React.useState("");
@@ -97,14 +98,14 @@ function SignIn() {
                 // Signed in
                 const user = userCredential.user;
                 console.log(user);
-                // ...
+                window.localStorage.setItem("user", JSON.stringify(user));
                 window.location.href = "/home";
             })
             .catch((error) => {
                 const errorCode = error.code;
                 console.log(errorCode);
                 const errorMessage = error.message;
-                console.log(errorMessage);
+                setErrorMessage(errorMessage);
                 // ..
             });
     };
@@ -119,8 +120,7 @@ function SignIn() {
                 console.log(token);
                 // The signed-in user info.
                 const user = result.user;
-                console.log(user);
-                // ...
+                window.localStorage.setItem("user", JSON.stringify(user));
                 window.location.href = "/home";
             })
             .catch((error) => {
@@ -136,12 +136,21 @@ function SignIn() {
                 const credential =
                     GoogleAuthProvider.credentialFromError(error);
                 console.log(credential);
+                setErrorMessage(errorMessage);
                 // ...
             });
     };
 
+    const checkIfLoggedIn = () => {
+        const user = JSON.parse(window.localStorage.getItem("user"));
+        if (user) {
+            window.location.href = "/home";
+        }
+    };
+
     useEffect(() => {
         window.scrollTo(0, 0);
+        checkIfLoggedIn();
     }, []);
 
     return (
@@ -184,9 +193,19 @@ function SignIn() {
                                 color: "green.main",
                                 textAlign: "center",
                             }}
+                            aria-describedby="sign-in-helper-text"
                         >
                             Sign In
                         </Typography>
+                        <FormHelperText
+                            id="sign-in-helper-text"
+                            sx={{
+                                color: "red.main",
+                            }}
+                        >
+                            {errorMessage &&
+                                "User not found / Incorrect password"}
+                        </FormHelperText>
                         <Box
                             sx={{
                                 width: "50%",

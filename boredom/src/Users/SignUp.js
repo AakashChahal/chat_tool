@@ -60,6 +60,7 @@ const theme = createTheme({
 function SignUp() {
     const [email, setEmail] = React.useState("");
     const [password, setPassword] = React.useState("");
+    const [errorMessage, setErrorMessage] = React.useState("");
     const [passwordConfirm, setPasswordConfirm] = React.useState("");
     const [passwordError, setPasswordError] = React.useState(false);
     const [emailError, setEmailError] = React.useState(false);
@@ -130,15 +131,14 @@ function SignUp() {
                 // Signed in
                 const user = userCredential.user;
                 console.log(user);
-                // ...
+                window.localStorage.setItem("user", JSON.stringify(user));
                 window.location.href = "/home";
             })
             .catch((error) => {
                 const errorCode = error.code;
                 console.log(errorCode);
                 const errorMessage = error.message;
-                console.log(errorMessage);
-                // ..
+                setErrorMessage(errorMessage);
             });
     };
 
@@ -152,29 +152,31 @@ function SignUp() {
                 console.log(token);
                 // The signed-in user info.
                 const user = result.user;
-                console.log(user);
-                // ...
+                window.localStorage.setItem("user", JSON.stringify(user));
                 window.location.href = "/home";
             })
             .catch((error) => {
-                // Handle Errors here.
                 const errorCode = error.code;
                 console.log(errorCode);
                 const errorMessage = error.message;
-                console.log(errorMessage);
-                // The email of the user's account used.
-                const email = error.customData.email;
-                console.log(email);
-                // The AuthCredential type that was used.
                 const credential =
                     GoogleAuthProvider.credentialFromError(error);
                 console.log(credential);
+                setErrorMessage(errorMessage);
                 // ...
             });
     };
 
+    const checkIfLoggedIn = () => {
+        const user = JSON.parse(window.localStorage.getItem("user"));
+        if (user) {
+            window.location.href = "/home";
+        }
+    };
+
     useEffect(() => {
         window.scrollTo(0, 0);
+        checkIfLoggedIn();
     }, []);
 
     return (
@@ -217,9 +219,18 @@ function SignUp() {
                                 color: "green.main",
                                 textAlign: "center",
                             }}
+                            aria-describedby="sign-up-helper-text"
                         >
                             Sign Up
                         </Typography>
+                        <FormHelperText
+                            id="sign-up-helper-text"
+                            sx={{
+                                color: "red.main",
+                            }}
+                        >
+                            {errorMessage && errorMessage}
+                        </FormHelperText>
                         <Box
                             sx={{
                                 width: "50%",
