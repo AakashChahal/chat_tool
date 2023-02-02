@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Typography, Box, Grid, Button, TextField } from "@mui/material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 
@@ -37,6 +37,35 @@ function Home() {
     const [message, setMessage] = useState("");
     const [messages, setMessages] = useState([]);
 
+    const [localStream, setLocalStream] = useState(null);
+    const [remoteStream, setRemoteStream] = useState(null);
+    const [peerConnection, setPeerConnection] = useState(null);
+
+    const localVideoRef = useRef();
+    const remoteVideoRef = useRef();
+
+    const startVideoChat = async () => {
+        const localStream = await navigator.mediaDevices.getUserMedia({
+            audio: true,
+            video: true,
+        });
+        setLocalStream(localStream);
+        localVideoRef.current.srcObject = localStream;
+
+        const peerConnection = new RTCPeerConnection();
+        setPeerConnection(peerConnection);
+        peerConnection.addStream(localStream);
+
+        peerConnection.onaddstream = (event) => {
+            setRemoteStream(event.stream);
+            remoteVideoRef.current.srcObject = event.stream;
+        };
+
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+        // Signaling code to send the offer to the remote peer goes here
+    };
+
     const postMessage = () => {
         if (message === "") return;
         const newMessage = {
@@ -66,17 +95,7 @@ function Home() {
 
     useEffect(() => {
         setMessages([...preMessages]);
-        const video = document.querySelector("video");
-        navigator.mediaDevices
-            .getUserMedia({ video: true })
-            .then((stream) => {
-                setVideoSrc(stream);
-                video.srcObject = stream;
-                video.play();
-            })
-            .catch((error) => {
-                console.error("Error:", error);
-            });
+        startVideoChat();
     }, []);
     return (
         <>
@@ -114,21 +133,18 @@ function Home() {
                                     marginLeft: "1vw",
                                 }}
                             >
-                                {videoSrc ? (
-                                    <video
-                                        style={{
-                                            width: "100%",
-                                            height: "100%",
-                                            borderRadius: "10px",
-                                            boxShadow:
-                                                "0 19px 51px 0 rgba(0,0,0,0.16), 0 14px 19px 0 rgba(0,0,0,0.07)",
-                                        }}
-                                        autoPlay
-                                        playsInline
-                                    />
-                                ) : (
-                                    <p>Loading video...</p>
-                                )}
+                                <video
+                                    ref={localVideoRef}
+                                    style={{
+                                        width: "100%",
+                                        height: "100%",
+                                        borderRadius: "10px",
+                                        boxShadow:
+                                            "0 19px 51px 0 rgba(0,0,0,0.16), 0 14px 19px 0 rgba(0,0,0,0.07)",
+                                    }}
+                                    autoPlay
+                                    playsInline
+                                />
                             </Box>
                             <Box
                                 sx={{

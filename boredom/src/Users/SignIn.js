@@ -155,7 +155,18 @@ function SignIn() {
 
     return (
         <ThemeProvider theme={theme}>
-            <Grid container spacing={2}>
+            <Grid
+                container
+                spacing={2}
+                sx={{
+                    height: "100vh",
+                    width: "100vw",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    alignContent: "center",
+                }}
+            >
                 <Grid item xs={12}>
                     <Typography
                         component="h1"
