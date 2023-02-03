@@ -47,7 +47,7 @@ function Home() {
     const startVideoChat = async () => {
         const localStream = await navigator.mediaDevices.getUserMedia({
             audio: true,
-            video: true,
+            video: { facingMode: "user" },
         });
         setLocalStream(localStream);
         localVideoRef.current.srcObject = localStream;
